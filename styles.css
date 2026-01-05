@@ -1,11 +1,13 @@
+.site-nav{
+   display: flex; 
+   align-items: center;
+}
 .name-title{
     padding-left: 2rem;
     padding-right: 2rem;
 }
 .nav-container{
-    display: flex;
     float: right;
-    align-items: center;
     justify-content: space-betweengit add;
     gap: 2rem;
 }
