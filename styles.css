@@ -85,7 +85,7 @@ html{
   overflow: hidden;
 
   background-color: var(--primary-bg-color);
-  background-image: url("assets/images/Block.png");
+  background-image: url("/images/Block.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 110% auto; /* slight zoom to hide transparent PNG margins */
@@ -225,7 +225,7 @@ html{
   justify-content: center;
   height: 25vh;
   width: auto;
-  background-image: url("assets/images/Cam.png");
+  background-image: url("/images/Cam.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 110% auto;
