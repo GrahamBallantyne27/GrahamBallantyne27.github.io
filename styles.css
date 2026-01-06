@@ -1,13 +1,17 @@
+/*DOCUMENT SETTINGS*/
+
 :root{
-  --primary-bg-color: #f2f2f2;
+  --nav-h: 72px;
+  --primary-bg-color: #FFFFFD;
   --secondary-bg-color: #AB9B96;
   --accent-bg-color: #333333;
-  --accent1: #2A9134;
+  --accent1: #7F9172;
 }
 
 *{
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 html{
@@ -15,24 +19,30 @@ html{
   background-color: var(--primary-bg-color);
 }
 
+
+/*NAVIGATION BAR*/
+
 .site-nav {
-   display: grid;
+  display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
 
-  padding: 0.5rem 1.5rem;
-  background-color: var(--primary-bg-color);
+  padding: 0.1rem 1.5rem;
+  background-color: var(--accent-bg-color);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
 
   position: fixed; /* optional */
   top: 0;
   left: 0;
   width: 100%;
+
+  z-index: 1000; 
 }
 
-.name-title {
+.name-nav {
   margin: 0;          /* VERY important */
   font-family: Helvetica, Arial, sans-serif;
-  color: var(--accent-bg-color)
+  color: var(--primary-bg-color)
 }
 
 .nav-container {
@@ -44,35 +54,109 @@ html{
 .nav-button{
   text-decoration: none;
   padding: 1rem;
-  color: var(--accent-bg-color);
+  color: var(--primary-bg-color);
+  font-family: Helvetica, Arial, sans-serif;
 }
 .nav-button:visited{
-  color:var(--accent-bg-color);
+  color:var(--primary-bg-color);
 }
 
 .nav-button:hover{
-  color: var(--primary-bg-color);
-  background-color: var(--accent-bg-color);
-}
-
-.background1{
+  color: var(--accent-bg-color);
   background-color: var(--primary-bg-color);
 }
-.welcome-block{
+
+/*LANDING PAGE*/
+
+.welcome-block {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh; /* more flexible than height */
+
+  min-height: 100vh;
+  height: 100svh;
+
+  /* full-bleed even if a parent has padding */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+
+  position: relative;
+  overflow: hidden;
+
+  background-color: var(--primary-bg-color);
+  background-image: url("assets/images/Block.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 110% auto; /* slight zoom to hide transparent PNG margins */
+
+  /* NOTE: filter affects the whole section (including text). If you only want
+     the background adjusted, move the image into a pseudo-element instead. */
+  filter: contrast(0.9) brightness(1.05);
+
+  scroll-margin-top: var(--nav-h);
 }
 
-.welcome-text{
-  padding-left: 7rem;
-  padding-right: 7rem;
+.welcome-block::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0) 55%,
+    rgba(255, 255, 255, 0.6) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.welcome-block::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.welcome-text {
+  padding: 3rem;
+  border-radius: 24px;
+  filter: contrast(1.5) brightness(1.05);
+
+  /* "glass" readability layer */
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  /* true fade at edges (soft, less noticeable) */
+  -webkit-mask-image: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 1) 40%,
+    rgba(0, 0, 0, 0.85) 55%,
+    rgba(0, 0, 0, 0.5) 70%,
+    rgba(0, 0, 0, 0.15) 85%,
+    rgba(0, 0, 0, 0) 100%
+  );
+
+  mask-image: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 1) 40%,
+    rgba(0, 0, 0, 0.85) 55%,
+    rgba(0, 0, 0, 0.5) 70%,
+    rgba(0, 0, 0, 0.15) 85%,
+    rgba(0, 0, 0, 0) 100%
+  );
+
+  /* ensure text sits above the overlays */
+  position: relative;
+  z-index: 3;
 }
 
 .welcome-message{
   text-align: center;
-  font-family: Arial, Helvetica, sans-serif;
+  padding-bottom: 1rem;
+  font-family: Helvetica, Arial sans-serif;
   font-size: 2.9rem;
   color: var(--accent-bg-color);
 }
@@ -85,6 +169,7 @@ html{
   margin: 0 auto;
 }
 
+/*ABOUT SECTION*/
 .headshot-wrapper {
   justify-self: center;
   align-self: center;
@@ -115,31 +200,57 @@ html{
 }
 
 .about-header{
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Helvetica, Arial sans-serif;
   font-size: 2.9rem;
   padding-left: 4rem;
-  padding-top: 2rem;
+  padding-top: 3.5rem;
   padding-bottom: 1rem;
 }
 
 .about-text{
   padding-left: 4rem;
+  padding-bottom: 3rem;
 }
 .about-text-line{
   font-size: 1.5rem;
   padding-top: 1rem;
 }
-.project-declaration{
+
+
+/*SECTIONING*/
+
+.section-declaration{
   display:flex;
   text-align: center;
   justify-content: center;
   height: 25vh;
   width: auto;
+  background-image: url("assets/images/Cam.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 110% auto;
   align-items: center;
+  font-family: Helvetica, Arial sans-serif;
+  font-size: 2.0rem;
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20%,
+    black 80%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20%,
+    black 80%,
+    transparent 100%
+  );
 }
 
-.project-declaration-text{
-  font-family: Arial, Helvetica, sans-serif;
+.section-declaration-text{
+  font-family: Helvetica, Arial sans-serif;
   font-size: 2.9rem;
 }
 
@@ -157,6 +268,187 @@ html{
 .left{
   padding-top: 2rem;
 }
+
+/*TIMELINE*/
+
+/* TIMELINE */
+.timeline {
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 0;
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+}
+
+/* vertical line */
+.timeline .line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 6px;
+  transform: translateX(-50%);
+  background-color: var(--accent-bg-color);
+}
+
+/* center line */
+.timeline::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 6px;
+  transform: translateX(-50%);
+  background-color: var(--accent-bg-color);
+}
+
+/* each timeline item */
+.tl {
+  position: relative;
+  width: 50%;
+  padding: 10px 40px;
+}
+
+/* left / right placement */
+.tl.left {
+  left: 0;
+  text-align: right;
+}
+
+.tl.right {
+  left: 50%;
+  text-align: left;
+}
+
+/* timeline dot (centered on the line) */
+.tl::after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  width: 22px;
+  height: 22px;
+  background-color: var(--accent-bg-color);
+  border: 4px solid var(--accent1);
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.tl.left::after {
+  left: 100%;                
+  transform: translateX(-50%); 
+}
+
+.tl.right::after {
+  left: 0%;                   
+  transform: translateX(-50%); 
+}
+
+.tl.left::before {
+  content: "";
+  position: absolute;
+  top: 22px;
+  right: 30px;
+  border: 10px solid transparent;
+  border-left-color: white;
+}
+
+.tl.right::before {
+  content: "";
+  position: absolute;
+  top: 22px;
+  left: 30px;
+  border: 10px solid transparent;
+  border-right-color: white;
+}
+
+/* card */
+.content {
+  position: relative;
+  padding: 20px 30px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 2px var(--accent-bg-color);
+}
+
+.content::before {
+  content: "";
+  position: absolute;
+  top: 22px;
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  top: 7%;
+  transform: translateY(-50%);
+}
+
+.tl.left .content::before {
+  right: -20px;
+  border-left-color: var(--accent-bg-color);
+}
+
+.tl.right .content::before {
+  left: -20px;
+  border-right-color: var(--accent-bg-color);
+}
+
+.timeline .line::before,
+.timeline .line::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  background-color: var(--accent-bg-color);
+  border-radius: 50%;
+  z-index: 3;
+}
+
+/* top cap */
+.timeline .line::before {
+  top: -10px;
+}
+
+/* bottom cap */
+.timeline .line::after {
+  bottom: -10px;
+}
+
+.tl-text{
+  text-align: center;
+}
+
+.tank{
+  display: block;        /* ← THIS is the missing piece */
+  width: 60%;
+  height: auto;          /* safer than 60% unless parent has height */
+  object-fit: contain;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.eco{
+  display: block;        /* ← THIS is the missing piece */
+  width: 70%;
+  height: auto;          /* safer than 60% unless parent has height */
+  object-fit: contain;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.turner{
+  display: block;        /* ← THIS is the missing piece */
+  width: 70%;
+  height: auto;          /* safer than 60% unless parent has height */
+  object-fit: contain;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/*PROJECT SPOTLIGHTS*/
 
 .project-image {
   display: block;
