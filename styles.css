@@ -194,27 +194,30 @@ html{
   background-color: var(--primary-bg-color);
 }
 
-.about-columns{
+.about-columns {
   display: grid;
   grid-template-columns: 70% 30%;
+  align-items: center;
+  margin-bottom: 1.5rem;
 }
 
-.about-header{
-  font-family: Helvetica, Arial sans-serif;
+.about-header {
+  font-family: Helvetica, Arial, sans-serif;
   font-size: 2.9rem;
   padding-left: 4rem;
   padding-top: 3.5rem;
-  padding-bottom: 1rem;
+  padding-bottom: 0rem;
 }
 
-.about-text{
+.about-text {
   padding-left: 4rem;
-  padding-bottom: 3rem;
 }
-.about-text-line{
+
+.about-text-line {
   font-size: 1.5rem;
   padding-top: 1rem;
 }
+
 
 
 /*SECTIONING*/
@@ -505,5 +508,97 @@ html{
 .project-button:hover {
   color: var(--primary-bg-color);
   background-color: var(--accent1);
+}
+
+.project-grid-container{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+
+  gap: 1rem;
+  height: 200px;
+  border: 2px solid black;
+
+  width: 70%;
+  margin: auto;
+}
+
+.project-block{
+  background-color: #f1f1f1;
+    border: 1px solid black;
+    padding: 10px;
+    text-align: center
+}
+
+.video-hero{
+  width: 100%;
+  height: 100vh;              /* fills the screen height */
+  position: relative;
+  overflow: hidden;
+  border-radius: 0;           /* change if your style uses rounded sections */
+}
+
+.video-hero__media{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;          /* fills as much as possible (may crop) */
+  object-position: center;
+  display: block;
+}
+
+.assignment-header{
+   font-family: Helvetica, Arial, sans-serif;
+  font-size: 2.9rem;
+  text-align: center;
+  width: 100%;
+  margin-top: 4rem;
+  margin-bottom: 3rem;
+}
+
+.data-block{
+  max-width: 100%;
+}
+
+.data-title{
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.data-table{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.data-table th,
+.data-table td{
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+}
+
+.data-table thead th{
+  font-weight: 600;
+  border-bottom: 2px solid rgba(0,0,0,0.15);
+}
+
+.data-table tbody tr{
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.data-table tbody tr:last-child{
+  border-bottom: none;
+}
+
+.linkage-image{
+  width: 100%;
+  max-width: 900px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.about-text--padded{
+  padding: 5rem 5rem;
 }
 

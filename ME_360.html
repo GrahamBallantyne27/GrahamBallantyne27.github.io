@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Graham's Portfolio</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <nav class="site-nav">
+      <div class="name-nav">
+        <p>Graham Ballantyne - Mechanical Engineer</p>
+      </div>
+
+      <div class="nav-container">
+        <a class="nav-button" href="index.html">Home</a>
+        <a class="nav-button" href="ME_360.html">ME 360</a>
+      </div>
+    </nav>
+
+    <header class="welcome-block">
+      <div class="welcome-text">
+        <h1 class="welcome-message">ME 360 Portfolio</h1>
+        <p class="welcome-sub">
+          Take a look at some of the projects I’ve worked on during my time at Boston
+          University’s College of Engineering.
+        </p>
+      </div>
+    </header>
+
+    <main>
+      <section class="About">
+        <h1 class="assignment-header">Container Challenge Linkage Project</h1>
+
+        <div class="video-hero">
+          <video class="video-hero__media" autoplay muted loop playsinline>
+            <source src="assets/Videos/ME_360_Assignment_1.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        <div class="about-text about-text--padded">
+          <p class="about-text-line">
+            <strong>Design Objectives:</strong> The objective of this project was to design and construct a four-bar 
+            linkage mechanism to function as an automated waste-dispensing system. Primary design constraints included 
+            maintaining all pivot points within the supporting structure and limiting the coupler link rotation to a 
+            maximum of 45° to prevent material spillage. Ultimately, the goal of this assignment was to gain hands-on 
+            experience with kinematic analysis software and to develop familiarity with Grübler’s criterion for 
+            determining degrees of freedom.
+          </p>
+
+          <p class="about-text-line">
+            <strong>Kinematic Analysis:</strong> The initial objective of this assignment was to model the given 
+            problem statement in a two-dimensional kinematic simulator, specifically <i>Math Illustrations</i>. Using the 
+            provided problem parameters, the initial and final positions of the coupler were defined and analyzed. 
+            Due to the incompatibility of perpendicular bisector theory with the full coupler endpoints, connection 
+            points were instead defined using variable references, and an intermediate position for these points was
+            developed, as shown in the figure below. Distances <i>a</i> and <i>b</i> were determined to provide 
+            sufficient clearance for the coupler and to position the crank arm beyond the coupler’s center of 
+            gravity in order to avoid misconfiguration caused by a geometric singularity during collinearity of the
+            crank and rocker links. Relevant dimensions of the system are presented in the table below.
+          </p>
+
+        </div>
+
+        <section class="section-t_A">
+          <div class="left">
+            <img
+              src="assets/Images/linkage-diagram.png"
+              alt="Four-bar linkage geometry"
+              class="linkage-image"
+            />
+          </div>
+
+          <div class="right">
+            <div class="data-block">
+              <h2 class="data-title">Linkage Geometry Parameters</h2>
+
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>x (in)</th>
+                    <th>y (in)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>OC</td>
+                    <td>3.6234228</td>
+                    <td>-3.6234228</td>
+                  </tr>
+                  <tr>
+                    <td>OD</td>
+                    <td>18.293621</td>
+                    <td>-18.293621</td>
+                  </tr>
+                  <tr>
+                    <td>c</td>
+                    <td>26.624294</td>
+                    <td>—</td>
+                  </tr>
+                  <tr>
+                    <td>d</td>
+                    <td>32.371087</td>
+                    <td>—</td>
+                  </tr>
+                  <tr>
+                    <td>b</td>
+                    <td>15</td>
+                    <td>—</td>
+                  </tr>
+                  <tr>
+                    <td>a</td>
+                    <td>5</td>
+                    <td>—</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <div class="about-text about-text--padded">
+            <p class="about-text-line">
+            <strong>Solidworks Motion Analysis:</strong> Once calculated in <i>Math Illustrations</i>, 
+            the linkages were constructed in SolidWorks. Members were defined with a thickness of 1.5 inches, 
+            half of which was applied as offset distances to the calculated pivot locations to ensure proper 
+            motion clearance and alignment. Two revolute hinge joints, one concentric joint, and one spherical 
+            joint were implemented to achieve a Grübler count of one degree of freedom. SolidWorks Motion Analysis 
+            was then used to compute the trajectory of the coupler endpoints.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>© 2026 Graham Ballantyne</p>
+    </footer>
+  </body>
+</html>
