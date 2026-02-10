@@ -602,3 +602,26 @@ html{
   padding: 5rem 5rem;
 }
 
+.full-image{
+  width: 100%;
+  max-width: 1100px;
+  margin: 3rem auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.full-image__media{
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.full-image__caption{
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: rgba(0,0,0,0.7);
+  text-align: center;
+  max-width: 90%;
+}
+
