@@ -1,0 +1,185 @@
+volatile long counter = 0;
+
+const long CPR = 240;
+const double kp = 0.9;
+const int minPWM = 50;
+const int maxPWM = 255;
+const int tolCounts = 3;
+
+int pwmPin = 5;
+int otherPin = 6;
+
+const double g = 32.1724 * 12.0;
+const double diam = 3.75;
+const double r = diam / 2.0;
+const double c = 3.1415926535 * diam;
+const double tl = 8.0 * 12.0;
+const double rpm_max = 220.0;
+const double k = 0.70;
+const double rad2rpm = 30.0 / 3.1415926535;
+
+double t1 = 0, t2 = 0, t3 = 0;
+double d1 = 0, d2 = 0, d3 = 0;
+double totalTime = 0;
+double totalRevs = 0;
+
+unsigned long tStartMs = 0;
+
+long homeCounts = 0;
+long finalCounts = 0;
+
+enum MoveState { GO_FWD, STOP_WAIT, GO_BACK, DONE };
+MoveState state = GO_FWD;
+
+void setup() {
+  pinMode(2, INPUT);
+  pinMode(3, INPUT);
+
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
+
+  attachInterrupt(digitalPinToInterrupt(2), encoderISR, RISING);
+
+  Serial.begin(9600);
+
+  noInterrupts();
+  homeCounts = counter;
+  interrupts();
+
+  const double hl = tl / 2.0;
+  const double linear_accel = k * (sqrt(2.0) / 12.0) * g;
+  const double angular_accel = linear_accel / r;
+  const double rpm_a = angular_accel * rad2rpm;
+
+  totalRevs = tl / c;
+
+  trapCalcs(totalRevs, rpm_max, rpm_a, t1, t2, t3, d1, d2, d3);
+  totalTime = t1 + t2 + t3;
+
+  finalCounts = (long)round((d1 + d2 + d3) * CPR);
+
+  tStartMs = millis();
+}
+
+void loop() {
+  double t = (millis() - tStartMs) / 1000.0;
+
+  double xref_rev = xRefFromTrap(t, t1, t2, t3, d1, d2, d3, rpm_max);
+  long xref_counts = (long)round(xref_rev * CPR);
+
+  long pos;
+  noInterrupts();
+  pos = counter;
+  interrupts();
+
+  long targetCounts;
+
+  if (state == GO_FWD)
+    targetCounts = homeCounts + xref_counts;
+  else if (state == GO_BACK)
+    targetCounts = homeCounts + finalCounts - xref_counts;
+  else
+    targetCounts = homeCounts;
+
+  long error = targetCounts - pos;
+
+  if (state == GO_FWD && t >= totalTime && labs(error) <= tolCounts) {
+    analogWrite(pwmPin, 0);
+    digitalWrite(otherPin, LOW);
+
+    state = STOP_WAIT;
+    Serial.println("Stopping before return");
+
+    delay(500);
+
+    int temp = pwmPin;
+    pwmPin = otherPin;
+    otherPin = temp;
+
+    tStartMs = millis();
+    state = GO_BACK;
+    return;
+  }
+
+  if (state == GO_BACK && t >= totalTime && labs(error) <= tolCounts) {
+    analogWrite(pwmPin, 0);
+    digitalWrite(otherPin, LOW);
+
+    state = DONE;
+
+    Serial.println("Returned to start");
+    return;
+  }
+
+  if (state == DONE)
+    return;
+
+  double cmd = kp * labs(error);
+  int pwm = (int)cmd;
+
+  pwm = constrain(pwm, 0, maxPWM);
+
+  if (pwm > 0 && pwm < minPWM)
+    pwm = minPWM;
+
+  digitalWrite(otherPin, LOW);
+  analogWrite(pwmPin, pwm);
+
+  delay(20);
+}
+
+void encoderISR() {
+  if (digitalRead(3) == HIGH)
+    counter++;
+  else
+    counter--;
+}
+
+void trapCalcs(double d, double v, double a,
+               double &t1, double &t2, double &t3,
+               double &d1, double &d2, double &d3) {
+  t1 = v / a;
+  d1 = (a * t1 * t1) / 120.0;
+
+  if (d >= 2.0 * d1) {
+    d2 = d - 2.0 * d1;
+    t2 = d2 / (v / 60.0);
+    t3 = t1;
+    d3 = d1;
+  } else {
+    t1 = sqrt(60.0 * d / a);
+    t2 = 0.0;
+    t3 = t1;
+
+    d1 = d / 2.0;
+    d2 = 0.0;
+    d3 = d / 2.0;
+  }
+}
+
+double xRefFromTrap(double t,
+                    double t1, double t2, double t3,
+                    double d1, double d2, double d3,
+                    double v_rpm) {
+  const double v = v_rpm / 60.0;
+
+  if (t <= 0) return 0;
+
+  if (t < t1) {
+    double u = t / t1;
+    return d1 * u * u;
+  }
+
+  if (t < t1 + t2) {
+    double tc = t - t1;
+    return d1 + v * tc;
+  }
+
+  if (t < t1 + t2 + t3) {
+    double td = t - (t1 + t2);
+    double u = td / t3;
+    return d1 + d2 + d3 * (1.0 - (1.0 - u) * (1.0 - u));
+  }
+
+  return d1 + d2 + d3;
+}

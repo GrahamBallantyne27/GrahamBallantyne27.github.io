@@ -30,6 +30,186 @@
     </header>
 
     <main>
+
+       <section class="About">
+    <h1 class="assignment-header">Closed Loop Motor Control</h1>
+    <p class="assignment-subtitle">Solidworks Motion Analysis</p>
+
+    <div class="about-text about-text--padded">
+      <p class="about-text-line">
+      <strong>Design Objectives:</strong> The goal of this closed-loop motor control analysis project 
+      was to determine the maximum acceleration of a DC motor–controlled cart over a defined distance 
+      and to complete a full oscillation between positions in the minimum possible time. The first 
+      step in this analysis was the design and simulation of the cart.
+      </p>
+
+      <p class="about-text-line">
+      <strong>Acceleration and Displacement Profile Calculations:</strong> The acceleration of the cart was determined through kinematic free-body diagram analysis. The symbolic results of this analysis were compiled into a MATLAB script that converts the system’s physical and geometric parameters (track length, wheel diameter, etc.) into the corresponding maximum motor RPM and time segments of acceleration required to achieve the desired displacement profile. The resulting script was used to generate the motion profile for the system. See the code provided below for implementation details. 
+
+A prototype cart was subsequently constructed to verify the analytical and computational results. The tipping acceleration of the cart was determined as the condition at which the reaction force on the tipping side of the cart approaches zero. A simulation of the cart motion is provided in the video below.
+      </p>
+    </div>
+
+    <div class="image-row">
+
+  <div class="image-half">
+    <img src="assets/Images/FBD.png" class="full-image__media" />
+    <p class="full-image__caption">
+      Figure 1: Tipping Acceleration FBD Analysis.
+    </p>
+  </div>
+
+  <div class="image-half">
+    <img src="assets/Images/code_page_1.png" class="full-image__media" />
+    <p class="full-image__caption">
+      Figure 2: Matlab Computational Code Page 1.
+    </p>
+  </div>
+
+  <div class="image-half">
+    <img src="assets/Images/code_page_2.png" class="full-image__media" />
+    <p class="full-image__caption">
+      Figure 3: Matlab Computational Code Page 2.
+    </p>
+  </div>
+
+</div>
+
+     <div class="about-text about-text--padded">
+      <p class="about-text-line">
+      <strong>Simulation Challenges and Design Choices</strong> The prototype cart incorporated several key design decisions. 
+              A wheel diameter of 1.5 inches was selected in order to evaluate performance under small-diameter 
+              wheel conditions. Teeth were added to the prototype wheel to increase friction at the wheel–floor 
+              interface and improve traction on the linoleum surface. Motor blocks were incorporated into the 
+              design to verify sufficient wheel clearance and ensure proper alignment of the drivetrain. 
+              Additionally, the bar was oriented along its diagonal to permit a greater allowable acceleration, 
+              as illustrated in the free-body diagram shown in Figure 1.
+      </p>
+      <p class = "about-text-line">
+        Several issues arose during the SolidWorks multibody 
+        simulation. The primary issue encountered was noise in the Linear Acceleration vs. Time and 
+        Reaction Force vs. Time plots when motion was applied using the “Segments” option. To mitigate 
+        this behavior, a ramp function was applied to the cart’s velocity profile in order to produce 
+        continuous results and eliminate outlier data. 
+        </p>
+        </div>
+
+        <div class="image-container-50">
+  <img
+    src="assets/Images/prototype.png"
+    alt="Free body diagram"
+  />
+
+  <p class="full-image__caption">
+    Figure 4: Prototype Cart Assembly Mechanical Drawing.
+  </p>
+</div>
+
+  <div class = "about-text--padded">
+    <p class = 'about-text-line'>
+      Additional difficulties were encountered when defining the mates connecting the bar to the cart. 
+      These issues were resolved by correctly applying a point-to-plane mate at the tipping point of 
+      the bar, which ensured the appropriate constraint and allowed the mechanism to rotate freely 
+      about the intended contact point. The resulting graphical representations of reaction force and linear 
+      acceleration are provided below. 
+      </p>
+    </div>
+
+     <div class="video-hero">
+          <video class="video-hero__media" autoplay muted loop playsinline>
+            <source src="assets/Videos/Dynamic_Simulation.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+    <div class="full-image">
+      <img
+        src="assets/Images/Linear_Accel.png"
+        alt="Project figure"
+        class="full-image__media"
+      />
+      <p class="full-image__caption">
+        Figure 5: Linear Acceleration vs Time for MATLAB Motion Analysis.
+      </p>
+    </div>
+
+    <div class="full-image">
+      <img
+        src="assets/Images/Reaction_Force.png"
+        alt="Project figure"
+        class="full-image__media"
+      />
+      <p class="full-image__caption">
+       Figure 6: Reaction Force vs Time for MATLAB Motion Analysis.
+      </p>
+    </div>
+
+    <p class="assignment-subtitle">Cart Prototype and Control Implimentation</p>
+
+    <div class = "about-text--padded">
+      <div class = "about-text-line">
+       <strong>Prototype Design Choices:</strong> After initial testing of the motor, an experimental 
+maximum speed of 220 RPM was determined by processing the encoder signal using an Arduino. 
+Using this value, the computational model was applied to determine the wheel diameter required 
+to achieve the target linear velocity, resulting in an optimal wheel diameter of approximately 
+3.75 inches. 
+
+The wheels were designed with internal cavity extrusions to reduce mass and minimize the 
+additional torque demand on the motor. Custom adapters for the axle and wheels were 
+3D-printed to ensure proper fit and alignment of the drivetrain components. All external 
+components, including the Arduino, MOSFET controller, and motor, were mounted on top of 
+the chassis in order to maintain a low center of gravity for the cart assembly. 
+
+Experimental testing further confirmed that no additional traction features were required to 
+maintain a no-slip condition between the wheels and the floor. 
+      </div>
+    </div>
+
+    <div class="download-row">
+
+  <a href="assets/Files/Arduino Code Final.txt" class="code-link" download>
+    Download Control Code
+  </a>
+
+  <a href="assets/Files/Prototype 1.zip" class="code-link" download>
+    Download Prototype Files
+  </a>
+
+</div>
+
+     <div class = "about-text--padded">
+   <p class="about-text-line">
+<strong>Control Code Implementation:</strong> The Arduino code was developed to implement the
+trapezoidal displacement profile computed during the analytical calculations. Physical system
+parameters such as track length, wheel diameter, experimentally measured motor speed, and
+allowable acceleration were incorporated directly into the code. These values were used to
+compute the time segments of acceleration, constant velocity, and deceleration required to
+complete the motion.
+</p>
+
+<p class="about-text-line">
+Encoder feedback was used to continuously measure cart position, allowing the controller to
+compare the measured position with the reference displacement profile. A proportional controller
+then converted the resulting position error into a PWM motor command, driving the cart along the
+desired trajectory. Once the forward motion was completed within the specified encoder tolerance,
+the motor direction was reversed and the same motion profile was applied to return the cart to
+its starting position.
+</p>
+</div>
+
+<div class="image-container-50">
+  <img
+    src="assets/Images/Cart.png"
+    alt="Free body diagram"
+  />
+
+  <p class="full-image__caption">
+    Figure 4: Finalized Cart Prototype with 3D Printed Adapters. Note Video Still Pending.
+  </p>
+</div>
+
+  </section>
+
       <section class="About">
         <h1 class="assignment-header">Container Challenge Linkage Project</h1>
 
