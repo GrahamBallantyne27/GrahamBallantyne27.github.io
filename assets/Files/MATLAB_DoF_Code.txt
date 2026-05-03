@@ -1,0 +1,684 @@
+%% TicTacToe_Robot.m
+% Tic-tac-toe UI with physical robot pick-and-place.
+
+function TicTacToe_Robot()
+
+    %% --- Serial Connection ------------------------------------------------
+    port = "COM6";
+    baud = 250000;
+    s = connectMarlin(port, baud);
+
+    %% --- Physical Coordinate Setup ----------------------------------------
+    in_to_mm = 25.4;
+
+    y_place_coords = [54.10, 104.90, 155.70];
+    x_place_coords = [67.50, 118.36, 169.16];
+
+    x_pick_coords  = [0, 231.7];
+    y_pick_coords  = [16, 60.45, 104.90, 149.35, 193.80];
+
+    d    = 3.9375;
+    d_mm = d * in_to_mm;
+    step = 100 / d_mm;
+
+    coords = buildCoords(x_place_coords, y_place_coords, ...
+                         x_pick_coords,  y_pick_coords, step);
+
+    xy_feedrate = 5000;
+    E_dist      = 14.5;
+    E_feedrate  = 550;
+
+    %% --- CPU Image Setup --------------------------------------------------
+    imageFolder = "C:\Users\gfbal\Desktop\BU Spring 26\ME 360\2.5 DoF\Images";
+
+    cpuImgs.win    = imread(fullfile(imageFolder, "Image1.jpg"));
+    cpuImgs.block  = imread(fullfile(imageFolder, "Image2.jpeg"));
+    cpuImgs.center = imread(fullfile(imageFolder, "Image3.jpg"));
+    cpuImgs.corner = imread(fullfile(imageFolder, "Image4.png"));
+
+    %% --- Game State -------------------------------------------------------
+    board      = zeros(3,3);
+    pickSource = cell(3,3);
+    pickIndex  = [1, 1];
+
+    currentPlayer = 1;
+    gameOver      = false;
+    robotBusy     = false;
+
+    cpuPlayer   = 2;
+    humanPlayer = 1;
+
+    %% --- Build UI ---------------------------------------------------------
+    fig = uifigure( ...
+        'Name',     'Tic-Tac-Toe Robot', ...
+        'Position', [300 200 460 560], ...
+        'Color',    [0.12 0.12 0.14]);
+
+    uilabel(fig, ...
+        'Text',                'TIC-TAC-TOE ROBOT', ...
+        'Position',            [0 500 460 40], ...
+        'FontSize',            24, ...
+        'FontWeight',          'bold', ...
+        'FontColor',           [0.95 0.95 0.90], ...
+        'HorizontalAlignment', 'center', ...
+        'BackgroundColor',     [0.12 0.12 0.14]);
+
+    statusLabel = uilabel(fig, ...
+        'Text',                'Player X — choose a square', ...
+        'Position',            [30 455 400 30], ...
+        'FontSize',            14, ...
+        'FontColor',           [0.60 0.85 0.60], ...
+        'HorizontalAlignment', 'center', ...
+        'BackgroundColor',     [0.12 0.12 0.14]);
+
+    cellSize   = 105;
+    cellGap    = 10;
+    gridWidth  = 3*cellSize + 2*cellGap;
+    gridLeft   = (460 - gridWidth) / 2;
+    gridBottom = 120;
+
+    btns = gobjects(3,3);
+
+    for i = 1:3
+        for j = 1:3
+            left   = gridLeft   + (j-1)*(cellSize + cellGap);
+            bottom = gridBottom + (3-i)*(cellSize + cellGap);
+
+            btns(i,j) = uibutton(fig, ...
+                'Text',            '', ...
+                'Position',        [left bottom cellSize cellSize], ...
+                'FontSize',        44, ...
+                'FontWeight',      'bold', ...
+                'BackgroundColor', [0.20 0.20 0.23], ...
+                'FontColor',       [0.95 0.95 0.90], ...
+                'ButtonPushedFcn', @(~,~) handleClick(i,j));
+        end
+    end
+%{
+    uibutton(fig, ...
+        'Text',            'RESET', ...
+        'Position',        [95 40 120 45], ...
+        'FontSize',        13, ...
+        'FontWeight',      'bold', ...
+        'BackgroundColor', [0.30 0.20 0.20], ...
+        'FontColor',       [0.95 0.70 0.60], ...
+        'ButtonPushedFcn', @(~,~) resetGame());
+%}
+
+    uibutton(fig, ...
+        'Text',            'END', ...
+        'Position',        [170 40 120 45], ...
+        'FontSize',        13, ...
+        'FontWeight',      'bold', ...
+        'BackgroundColor', [0.20 0.20 0.30], ...
+        'FontColor',       [0.80 0.85 1.00], ...
+        'ButtonPushedFcn', @(~,~) cleanup());
+
+    fig.CloseRequestFcn = @(~,~) cleanup();
+
+    %% --- CPU Image Popup --------------------------------------------------
+    screenSize = get(0, 'ScreenSize');
+
+    imgFig = uifigure( ...
+        'Name', 'CPU Move', ...
+        'Position', [screenSize(3)-360, screenSize(4)-330, 320, 260], ...
+        'Color', [0.12 0.12 0.14]);
+
+    imgAx = uiaxes(imgFig, ...
+        'Position', [10 10 300 240]);
+
+    axis(imgAx, 'off')
+    imgAx.XTick = [];
+    imgAx.YTick = [];
+
+    %% =====================================================================
+    %  Nested functions
+    %% =====================================================================
+
+    function handleClick(row, col)
+
+        if gameOver || robotBusy || board(row,col) ~= 0
+            return
+        end
+
+        robotBusy = true;
+        setButtonsEnabled(false);
+
+        player = currentPlayer;
+
+        pLabel = getPickLabel(player, pickIndex(player));
+        pickIndex(player) = pickIndex(player) + 1;
+
+        plLabel = gridToPlaceLabel(row, col);
+        pickSource{row, col} = pLabel;
+
+        board(row, col) = player;
+        updateButtonDisplay(row, col, player);
+
+        statusLabel.Text = sprintf('Robot moving piece to %s...', plLabel);
+        statusLabel.FontColor = [0.85 0.75 0.40];
+        drawnow;
+
+        try
+            executeMove(s, coords, pLabel, plLabel, xy_feedrate, E_dist, E_feedrate);
+        catch err
+            magnetOff(s);
+            statusLabel.Text = "Robot error: " + string(err.message);
+            statusLabel.FontColor = [0.90 0.40 0.40];
+            robotBusy = false;
+            setButtonsEnabled(true);
+            return
+        end
+
+        robotBusy = false;
+
+        if checkWin(board, player)
+            gameOver = true;
+            statusLabel.Text = sprintf('Player %s wins!', playerSymbol(player));
+            statusLabel.FontColor = [0.60 0.90 0.60];
+            highlightWin(player);
+            drawnow;
+            pause(2)
+            resetPieces();
+            resetGame();
+            return
+        end
+
+        if all(board ~= 0, 'all')
+            gameOver = true;
+            statusLabel.Text = 'Draw!';
+            statusLabel.FontColor = [0.70 0.70 0.80];
+            drawnow;
+            pause(2)
+            resetPieces();
+            resetGame();
+            return
+        end
+
+        currentPlayer = 3 - currentPlayer;
+
+        if currentPlayer == cpuPlayer && ~gameOver
+            statusLabel.Text = 'CPU thinking...';
+            statusLabel.FontColor = [0.70 0.70 0.90];
+            drawnow;
+            pause(0.4)
+
+            [cpuRow, cpuCol, moveType] = getCpuMove(board, cpuPlayer, humanPlayer);
+            showCpuImage(moveType);
+
+            handleClick(cpuRow, cpuCol);
+        else
+            statusLabel.Text = sprintf('Player %s — choose a square', playerSymbol(currentPlayer));
+            statusLabel.FontColor = [0.60 0.85 0.60];
+            setButtonsEnabled(true);
+        end
+
+    end
+
+    function won = checkWin(b, player)
+        won = any(all(b == player, 1)) || ...
+              any(all(b == player, 2)) || ...
+              all(diag(b) == player) || ...
+              all(diag(fliplr(b)) == player);
+    end
+
+    function resetPieces()
+
+        statusLabel.Text = 'Returning pieces to start...';
+        statusLabel.FontColor = [0.70 0.70 0.90];
+        drawnow;
+
+        for ii = 1:3
+            for jj = 1:3
+                if board(ii,jj) ~= 0
+
+                    plLabel = gridToPlaceLabel(ii, jj);
+                    pLabel  = pickSource{ii, jj};
+
+                    try
+                        moveToPlaceLabel(s, coords, plLabel, xy_feedrate);
+                        pickCycle(s, E_dist, E_feedrate);
+
+                        moveToPickLabel(s, coords, pLabel, xy_feedrate);
+                        placeCycle(s, E_dist, E_feedrate);
+                    catch err
+                        magnetOff(s);
+                        statusLabel.Text = "Reset error: " + string(err.message);
+                        statusLabel.FontColor = [0.90 0.40 0.40];
+                        return
+                    end
+
+                end
+            end
+        end
+
+        returnToOrigin(s, xy_feedrate);
+
+    end
+
+    function resetGame()
+
+        board         = zeros(3,3);
+        pickSource    = cell(3,3);
+        currentPlayer = 1;
+        gameOver      = false;
+        robotBusy     = false;
+        pickIndex     = [1, 1];
+
+        for ii = 1:3
+            for jj = 1:3
+                btns(ii,jj).Text            = '';
+                btns(ii,jj).BackgroundColor = [0.20 0.20 0.23];
+                btns(ii,jj).FontColor       = [0.95 0.95 0.90];
+                btns(ii,jj).Enable          = true;
+            end
+        end
+
+        statusLabel.Text      = 'Player X — choose a square';
+        statusLabel.FontColor = [0.60 0.85 0.60];
+
+    end
+
+    function cleanup()
+
+    try
+        % Move robot home BEFORE disconnect
+        returnToOrigin(s, xy_feedrate);
+
+        % Turn off magnet just in case
+        magnetOff(s);
+
+        % Then disconnect
+        disconnectMarlin(s);
+        clear s;
+
+    catch err
+        disp("Cleanup error: " + err.message)
+    end
+
+    if isvalid(imgFig)
+        delete(imgFig);
+    end
+
+    if isvalid(fig)
+        delete(fig);
+    end
+
+end
+
+    function updateButtonDisplay(row, col, player)
+        if player == 1
+            btns(row,col).Text      = 'X';
+            btns(row,col).FontColor = [0.45 0.75 0.95];
+        else
+            btns(row,col).Text      = 'O';
+            btns(row,col).FontColor = [0.95 0.60 0.50];
+        end
+        btns(row,col).BackgroundColor = [0.16 0.16 0.19];
+    end
+
+    function setButtonsEnabled(state)
+        for ii = 1:3
+            for jj = 1:3
+                if board(ii,jj) == 0
+                    btns(ii,jj).Enable = state;
+                end
+            end
+        end
+    end
+
+    function highlightWin(player)
+        if player == 1
+            color = [0.20 0.35 0.50];
+        else
+            color = [0.50 0.25 0.20];
+        end
+
+        for ii = 1:3
+            for jj = 1:3
+                if board(ii,jj) == player
+                    btns(ii,jj).BackgroundColor = color;
+                end
+            end
+        end
+    end
+
+    function sym = playerSymbol(player)
+        if player == 1
+            sym = 'X';
+        else
+            sym = 'O';
+        end
+    end
+
+    function [row, col, moveType] = getCpuMove(b, cpu, human)
+
+        [row, col] = findWinningMove(b, cpu);
+        if ~isnan(row)
+            moveType = "win";
+            return
+        end
+
+        [row, col] = findWinningMove(b, human);
+        if ~isnan(row)
+            moveType = "block";
+            return
+        end
+
+        if b(2,2) == 0
+            row = 2;
+            col = 2;
+            moveType = "center";
+            return
+        end
+
+        corners = [1 1; 1 3; 3 1; 3 3];
+        for k = 1:size(corners,1)
+            r = corners(k,1);
+            c = corners(k,2);
+            if b(r,c) == 0
+                row = r;
+                col = c;
+                moveType = "corner";
+                return
+            end
+        end
+
+        [row, col] = find(b == 0, 1);
+        moveType = "corner";
+
+    end
+
+    function [row, col] = findWinningMove(b, player)
+
+        row = NaN;
+        col = NaN;
+
+        for r = 1:3
+            for c = 1:3
+                if b(r,c) == 0
+                    testBoard = b;
+                    testBoard(r,c) = player;
+
+                    if checkWin(testBoard, player)
+                        row = r;
+                        col = c;
+                        return
+                    end
+                end
+            end
+        end
+
+    end
+
+    function showCpuImage(moveType)
+
+        cla(imgAx)
+
+        img = cpuImgs.(char(moveType));
+
+        imshow(img, 'Parent', imgAx, ...
+            'InitialMagnification', 'fit');
+
+        axis(imgAx, 'image')
+        axis(imgAx, 'off')
+
+        drawnow;
+
+    end
+
+end
+
+%% =========================================================================
+%  Standalone functions
+%% =========================================================================
+
+function label = getPickLabel(player, index)
+    if player == 1
+        prefix = 'X';
+    else
+        prefix = 'O';
+    end
+    label = sprintf('%c%d', prefix, index);
+end
+
+function label = gridToPlaceLabel(row, col)
+    colLetters = ['A', 'B', 'C'];
+    label = sprintf('%c%d', colLetters(col), row);
+end
+
+function coords = buildCoords(x_place, y_place, x_pick, y_pick, step)
+
+    coords = struct();
+    x_labels = ['A','B','C'];
+    y_labels = [1, 2, 3];
+
+    for i = 1:length(y_place)
+        for j = 1:length(x_place)
+            label = sprintf('%c%d', x_labels(j), y_labels(i));
+            coords.place.(label).x_mm  = x_place(j);
+            coords.place.(label).y_mm  = y_place(i);
+            coords.place.(label).x_cmd = x_place(j) * step;
+            coords.place.(label).y_cmd = y_place(i) * step;
+        end
+    end
+
+    pick_labels = ['X', 'O'];
+
+    for i = 1:length(x_pick)
+        for j = 1:length(y_pick)
+            label = sprintf('%c%d', pick_labels(i), j);
+            coords.pick.(label).x_mm  = x_pick(i);
+            coords.pick.(label).y_mm  = y_pick(j);
+            coords.pick.(label).x_cmd = x_pick(i) * step;
+            coords.pick.(label).y_cmd = y_pick(j) * step;
+        end
+    end
+
+end
+
+function executeMove(s, coords, pickLabel, placeLabel, xy_feedrate, E_dist, E_feedrate)
+
+    try
+        moveToPickLabel(s, coords, pickLabel, xy_feedrate);
+        pickCycle(s, E_dist, E_feedrate);
+
+        moveToPlaceLabel(s, coords, placeLabel, xy_feedrate);
+        placeCycle(s, E_dist, E_feedrate);
+    catch err
+        magnetOff(s);
+        rethrow(err);
+    end
+
+end
+
+function moveTableXY(s, x_cmd, y_cmd, feedrate)
+
+    marlin_X = x_cmd;
+    marlin_Y = x_cmd;
+    marlin_Z = y_cmd;
+
+    cmd = sprintf("G1 X%.3f Y%.3f Z%.3f F%.0f", ...
+                  marlin_X, marlin_Y, marlin_Z, feedrate);
+
+    sendMotionAndWait(s, cmd);
+
+end
+
+function moveToPlaceLabel(s, coords, label, feedrate)
+
+    label = char(label);
+
+    if ~isfield(coords.place, label)
+        error("Invalid place label: %s", label)
+    end
+
+    target = coords.place.(label);
+
+    disp("Moving to place: " + label)
+    moveTableXY(s, target.x_cmd, target.y_cmd, feedrate);
+
+end
+
+function moveToPickLabel(s, coords, label, feedrate)
+
+    label = char(label);
+
+    if ~isfield(coords.pick, label)
+        error("Invalid pick label: %s", label)
+    end
+
+    target = coords.pick.(label);
+
+    disp("Moving to pick: " + label)
+    moveTableXY(s, target.x_cmd, target.y_cmd, feedrate);
+
+end
+
+function returnToOrigin(s, feedrate)
+
+    disp("Returning to origin")
+    sendMotionAndWait(s, sprintf("G1 X0 Y0 F%.0f", feedrate));
+    pause(0.3)
+    sendMotionAndWait(s, sprintf("G1 Z0 F%.0f", feedrate));
+
+end
+
+function pickCycle(s, E_dist, feedrate)
+
+    moveE(s, -E_dist, feedrate);
+    pause(0.3)
+
+    magnetOn(s);
+    pause(0.5)
+
+    moveE(s, E_dist, feedrate);
+
+end
+
+function placeCycle(s, E_dist, feedrate)
+
+    moveE(s, -E_dist, feedrate);
+    pause(0.3)
+
+    magnetOff(s);
+    pause(0.5)
+
+    moveE(s, E_dist, feedrate);
+
+end
+
+function moveE(s, dist, feedrate)
+
+    sendAndWait(s, "M83");
+    sendMotionAndWait(s, sprintf("G1 E%.3f F%.0f", dist, feedrate));
+    sendAndWait(s, "M82");
+    sendAndWait(s, "G90");
+
+end
+
+function s = connectMarlin(port, baud)
+
+    existing = serialportfind("Port", port);
+    if ~isempty(existing)
+        delete(existing);
+        disp("Released stale connection on " + port)
+        pause(1);
+    end
+
+    s = serialport(port, baud, "Timeout", 120);
+    configureTerminator(s, "LF");
+
+    pause(2);
+    flush(s);
+
+    disp("Connected to Marlin on " + port)
+
+    sendAndWait(s, "G90");
+    sendAndWait(s, "M82");
+
+    sendAndWait(s, "M203 Z2500");
+    sendAndWait(s, "M201 Z300");
+    sendAndWait(s, "M205 Z5");
+
+    sendAndWait(s, "G92 X0 Y0 Z0 E0");
+
+    magnetOff(s);
+
+end
+
+function disconnectMarlin(s)
+
+    magnetOff(s);
+    sendAndWait(s, "M18");
+    flush(s);
+
+    disp("Disconnected. Motors disabled.")
+
+end
+
+function sendAndWait(s, cmd)
+
+    flush(s);
+    writeline(s, cmd);
+    disp("Sent: " + cmd)
+    waitForOk(s);
+
+end
+
+function sendMotionAndWait(s, cmd)
+
+    flush(s);
+    writeline(s, cmd);
+    disp("Sent: " + cmd)
+    waitForOk(s);
+
+    flush(s);
+    writeline(s, "M400");
+    disp("Sent: M400")
+    waitForOk(s);
+
+end
+
+function waitForOk(s)
+
+    timeout_s = 120;
+    t_start = tic;
+
+    while toc(t_start) < timeout_s
+
+        if s.NumBytesAvailable > 0
+            line = strtrim(readline(s));
+
+            if ~isempty(line)
+                disp("  Marlin: " + line)
+            end
+
+            if contains(line, "ok", "IgnoreCase", true)
+                return
+            end
+        else
+            pause(0.05)
+        end
+
+    end
+
+    error("Timed out waiting for Marlin ok.")
+
+end
+
+function magnetOn(s)
+
+    disp("Magnet ON")
+    writeline(s, "M42 P9 S255");
+    pause(0.3)
+
+end
+
+function magnetOff(s)
+
+    disp("Magnet OFF")
+    writeline(s, "M42 P9 S0");
+    pause(0.3)
+
+end

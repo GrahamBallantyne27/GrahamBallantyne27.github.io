@@ -29,9 +29,301 @@
       </div>
     </header>
 
+    <nav class="project-nav">
+      <a href="#tic-tac-toe">Tic Tac Toe</a>
+      <a href="#plotter">Plotter</a>
+      <a href="#motor-control">Motor Control</a>
+      <a href="#linkage">Linkage</a>
+      <a href="#four-bar">Four Bar</a>
+    </nav>
+
     <main>
 
-       <section class="About">
+      <section class="about" id="tic-tac-toe">
+
+        <h1 class = "assignment-header">Automated Tic Tac Toe Board</h1>
+        <p class = 'assignment-subtitle'> 2.5 Degrees of Freedom Final Project</p>
+
+        <div class = "about-text about-text--padded">
+
+            <p class= about-text-line>
+              <strong>Design Objectives:</strong> The objective of this project was to design and implement a 
+              2.5 degree-of-freedom (DOF) system capable of fully automating a game of tic-tac-toe. The system 
+              DOF configuration consisted of two translational degrees of freedom enabling planar (X–Y) 
+              positioning, and an additional half degree of freedom corresponding to a vertical (Z-axis) 
+              pick-and-place mechanism for discrete piece manipulation.
+            </p>
+
+            <p class = about-text-line>
+              <strong>Prototype Design:</strong> All components of the automated tic-tac-toe system were designed using 
+              SolidWorks CAD software. A primary design constraint during the development phase was the available stock 
+              length of 80/20 aluminum extrusions. The assembly was therefore dimensioned to accommodate two 11-inch extrusions 
+              and one 12-inch extrusion, with the overall system geometry defined accordingly to ensure efficient material utilization 
+              and structural compatibility.
+              <br>
+              <br>
+              The first components to be designed were fittings between the 80/20 aluminum and the pin and stepper motor tp form one linear axis.
+            </p>
+
+            <div class="image-row-2">
+
+              <div class="image-half">
+                <img src="assets/Images/Motor_Holder.PNG" class="full-image__media" />
+                  <p class="full-image__caption">
+                  Figure X: Motor holder for x-axis linear slide assembly.
+                  </p>
+              </div>
+
+              <div class="image-half">
+                <img src="assets/Images/Pin_Holder.PNG" class="full-image__media" />
+                  <p class="full-image__caption">
+                  Figure X: Pin holder for x-axis linear slide assembly.
+                  </p>
+              </div>
+
+            </div>
+
+            <div class="image-container-50">
+              <img
+                src="assets/Images/Silder_Assem.PNG"
+                alt="Free body diagram"
+              />
+
+              <p class="full-image__caption">
+                Figure 4: X-axis linear motion slider.
+              </p>
+            </div>
+
+            <p class="about-text-line">
+              <strong>X-Axis Linear Slider Integration:</strong> Following development of the primary axis, the secondary planar (X-axis) slider assemblies were constructed. A key design consideration during this phase was maintaining precise horizontal alignment of the timing belt mounting features. Initial iterations exhibited misalignment, necessitating successive design refinements to ensure proper belt tracking and minimize off-axis loading.
+
+              The slider assemblies were designed to interface directly with 80/20 aluminum extrusion profiles, enabling modular assembly and disassembly of the system. This approach improved structural alignment, facilitated rapid iteration, and allowed for straightforward integration of additional components within the overall frame.
+            </p>
+
+            <div class="image-row-2">
+
+              <div class="image-half">
+                <img src="assets/Images/Combined_Slider_Y.PNG" class="full-image__media" />
+                  <p class="full-image__caption">
+                  Figure X: Motor holder for x-axis linear slide assembly.
+                  </p>
+              </div>
+
+              <div class="image-half">
+                <img src="assets/Images/Undriven_Slider_Y.PNG" class="full-image__media" />
+                  <p class="full-image__caption">
+                  Figure X: Pin holder for x-axis linear slide assembly.
+                  </p>
+              </div>
+
+            </div>
+
+            <p class="about-text-line">
+              <strong>Y-Axis Linear Slider Design:</strong> The Y-axis linear slider was developed using a modular design approach to facilitate manufacturability and assembly. Initial prototyping revealed that printing the integrated timing belt profile resulted in poor feature resolution due to unsupported overhangs during the additive manufacturing process. To address this limitation, the slider was redesigned to incorporate fixture-based interfaces, enabling the component to be fabricated as modular subassemblies with improved print orientation and structural integrity.
+
+              In addition, a rack-and-pinion transmission system was implemented to provide the half degree of freedom associated with vertical (Z-axis) motion. This mechanism enabled controlled linear displacement of the end effector, allowing for discrete pick-and-place functionality within the overall 2.5 DOF system.
+          </p>
+
+          <div class="image-container-75">
+              <img
+                src="assets/Images/XY_Assem.PNG"
+                alt="Complete Assembly"
+              />
+
+              <p class="full-image__caption">
+                Figure 4: Complete 2.5 DoF system assembly.
+              </p>
+            </div>
+
+            <p class = "about-text-line">
+              <strong>Assembly Process</strong>: The assembly of the automatic tic-tac-toe machine proved exceedingly manageable as a result of adequate computer aided design considerations. 
+              All 3D printted mouting components were attached to NEMA-17 motors using M4 metric screws (attached by threading the 3D prints), and mounts to the 80/20 aluminum through 1/4"-20 sockethead screws. 
+              The tic-tac-toe board was laser cut from MDF board due to availability in EPIC. Mounting fixtures for attachment of the board to the aluminum frame were printed and implimented into design. Mount lifts and a 
+              Chassis for the Arduino Mega ADK board were also laser cut from MDF. 
+            </p>
+
+            <div class="image-row">
+
+  <div class="image-half">
+    <img src="assets/Images/p1.jpeg" class="full-image__media" />
+    <p class="full-image__caption">
+      Figure X: Assembled X-Axis slider.
+    </p>
+  </div>
+
+  <div class="image-half">
+    <img src="assets/Images/p3.jpeg" class="full-image__media" />
+    <p class="full-image__caption">
+      Figure X: Preliminary board assembly.
+    </p>
+  </div>
+
+  <div class="image-half">
+    <img src="assets/Images/p4.jpeg" class="full-image__media" />
+    <p class="full-image__caption">
+      Figure X: Assembly and wiring of Z-axis actuator.
+    </p>
+  </div>
+
+</div>
+
+    <p class = "about-text-line">
+      <strong>Electromagnet Integration:</strong> A 5 V DC electromagnet was implemented as the primary end-effector for piece manipulation within the automated tic-tac-toe system. The electromagnet was driven via the FAN MOSFET output of the Arduino Mega ADK running Marlin firmware, enabling PWM-controlled on/off actuation.
+
+      As the electromagnet constitutes an inductive load, a flyback diode (1N4007) was installed in parallel with the coil, with the cathode connected to the supply (FAN+) and the anode connected to the switching node (FAN−). This configuration suppresses voltage transients generated during switching and protects the onboard MOSFET from inductive kickback.
+    </p>
+
+    <div class="image-container-50">
+              <img
+                src="assets/Images/circuit.png"
+                alt="Free body diagram"
+              />
+
+              <p class="full-image__caption">
+                Figure 4: Circuit diagram for electromagnet integration.
+              </p>
+            </div>
+
+
+            <p class="about-text-line">
+              <strong>Code Integration:</strong> System control was implemented in MATLAB via a serial communication interface with the Arduino Mega ADK running Marlin firmware. MATLAB scripts were used to transmit G-code commands governing X–Y positioning and Z-axis actuation, while auxiliary commands were issued to control the electromagnet through the FAN MOSFET output. This architecture enabled coordinated pick-and-place operations by synchronizing motion commands with discrete magnet actuation, resulting in automated execution of tic-tac-toe gameplay.
+            </p>
+
+            <div class="download-row">
+
+              <a href="assets/Files/MATLAB_DoF_Code.txt" class="code-link" download>
+                Download Project Code
+              </a>
+
+            <a href="assets/Files/XY_Assem.zip" class="code-link" download>
+              Download Assembly File
+            </a>
+
+          </div>
+
+          <p class="about-text-line">
+            <strong>Final Results:</strong> A 2.5 degree-of-freedom (DOF) system capable of autonomously executing and resetting a game of tic-tac-toe was successfully developed. Using calibrated positional data derived from the SolidWorks assembly and G-code command execution via Marlin firmware, the system achieved a high degree of positional accuracy and repeatability across all tested scenarios. 
+
+            Additionally, a MATLAB-based user interface was implemented to enhance system usability and enable interactive control of gameplay operations.
+          </p>
+
+          <div class="video-pair">
+
+            <div class="video-card">
+              <video class="video-card__media" controls preload="none" poster="">
+              <source src="assets/Images/video1.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            <p class="full-image__caption">Figure X: Caption for video one.</p>
+          </div>
+
+            <div class="video-card">
+               <video class="video-card__media" controls preload="none" poster="">
+                <source src="" type="video/mp4" />
+                  Your browser does not support the video tag.
+              </video>
+            <p class="full-image__caption">Figure X: Caption for video two.</p>
+          </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+        </div>
+
+      </section>
+
+      <section class="about" id="plotter">
+
+        <h1 class = "assignment-header">Plotter Excersise</h1>
+        <p class = 'assignment-subtitle'>2.5 Degree of Freedom Practice</p>
+
+        <div class = "about-text about-text--padded">
+
+          <p class = "about-text-line">
+            <strong>Design Objectives</strong>: The goal of this in class-activity was to
+            construct a 2.5 degree of freedom system capable of drawing approproatley vectorized images. 
+            The primary design objective was to translate the rotational motion of a stepper motor to linear motion
+            along specified axes, and to integreate 3d printing software and approproate firmware to allow for graphics plotting. 
+          </p>
+
+          <p class = about-text-line>
+            <strong>Linear Actuator Construction:</strong> Linear actuators were implemented using NEMA-17 stepper motors coupled to a 
+            lead screw mechanism to achieve rotary-to-linear motion conversion. The carriage and supporting structure were fabricated from 
+            polystyrene board. A threaded rod interfaced with a fixed nut adhered to the carriage, such that motor rotation induced 
+            linear translation of the carriage along the screw axis, enabling precise position-controlled actuation. 
+          </p>
+
+          <div class="image-container-50">
+            <img
+              src="C:\portfolio_site\assets\Images\single_actuator.jpeg"
+              alt="Free body diagram"
+            />
+
+            <p class="full-image__caption">
+               Figure 4: Construction of single linear actuator for plotter excersise.
+            </p>
+        </div>
+
+        <p class = about-text-line>
+            <strong>System Integration:</strong> A 2.5 degree-of-freedom (DOF) system was achieved through the integration of two full-DOF 
+            linear actuators and one half-DOF actuator. The planar (X–Y) motion was implemented using two orthogonally oriented linear 
+            stages, each driven by NEMA-17 stepper motors and controlled via the X and Y driver outputs of an Arduino Mega ADK running 
+            Marlin firmware. 
+
+            The additional half degree of freedom corresponding to vertical (Z-axis) motion was implemented using the E0 driver port, 
+            repurposed to actuate a pen-lift mechanism. This mechanism utilized a rack-and-pinion transmission to convert rotational 
+            motion of the stepper motor into vertical displacement of a Sharpie pen. The resulting system enabled precise planar positioning 
+            with discrete pen engagement, consistent with 2.5 DOF operation.
+        </p>
+
+        <p class = about-text-line>
+          <strong>Software Infrastructure:</strong> Repetier-Host 3D printing software was utilized to interface with an Arduino Mega ADK 
+          running Marlin firmware. Vectorized image data was converted into G-code using external preprocessing tools, enabling 
+          compatibility with the Repetier-Host control environment and subsequent interpretation by the onboard motion controller.
+
+          Through the definition and calibration of an appropriate coordinate frame and origin within the experimental setup, the generated 
+          toolpaths were accurately mapped to the physical workspace. This calibration enabled precise reconstruction of the original vectorized 
+          images using the plotter system.
+
+          <div class="image-row">
+
+  <div class="image-half">
+    <img src="assets/Images/system_1.jpeg" class="full-image__media" />
+    <p class="full-image__caption">
+      Figure X: Plotter excersie system set-up, view 1.
+    </p>
+  </div>
+
+  <div class="image-half">
+    <img src="assets/Images/system_2.jpeg" class="full-image__media" />
+    <p class="full-image__caption">
+      Figure X: Plotter excersie system set-up, view 2.
+    </p>
+  </div>
+
+  <div class="image-half">
+    <img src="assets/Images/system_results.jpeg" class="full-image__media" />
+    <p class="full-image__caption">
+      Figure X: Plotter excersise result graphics.
+    </p>
+  </div>
+
+</div>
+
+
+
+        </div>
+
+      </section>
+
+       <section class="About" id="motor-control">
     <h1 class="assignment-header">Closed Loop Motor Control</h1>
     <p class="assignment-subtitle">Solidworks Motion Analysis</p>
 
@@ -94,16 +386,16 @@ A prototype cart was subsequently constructed to verify the analytical and compu
         </p>
         </div>
 
-        <div class="image-container-50">
-  <img
-    src="assets/Images/prototype.png"
-    alt="Free body diagram"
-  />
+      <div class="image-container-50">
+            <img
+              src="assets/Images/prototype.png"
+              alt="Free body diagram"
+          />
 
-  <p class="full-image__caption">
-    Figure 4: Prototype Cart Assembly Mechanical Drawing.
-  </p>
-</div>
+        <p class="full-image__caption">
+          Figure 4: Prototype Cart Assembly Mechanical Drawing.
+        </p>
+      </div>
 
   <div class = "about-text--padded">
     <p class = 'about-text-line'>
@@ -111,7 +403,7 @@ A prototype cart was subsequently constructed to verify the analytical and compu
       These issues were resolved by correctly applying a point-to-plane mate at the tipping point of 
       the bar, which ensured the appropriate constraint and allowed the mechanism to rotate freely 
       about the intended contact point. The resulting graphical representations of reaction force and linear 
-      acceleration are provided below. 
+      acceleration are provided below. The record time of traversing a 8 foot track was found to be 6.33 seconds. 
       </p>
     </div>
 
@@ -212,7 +504,7 @@ its starting position.
 
   </section>
 
-      <section class="About">
+      <section class="About" id="linkage">
         <h1 class="assignment-header">Container Challenge Linkage Project</h1>
 
         <div class="video-hero">
@@ -317,7 +609,7 @@ its starting position.
         </div>
       </section>
 
-      <section class="About">
+      <section class="About" id="four-bar">
         <h1 class="assignment-header">Four Bar Linkage Tutorial</h1>
 
         <div class="video-hero">

@@ -8,12 +8,19 @@
   --secondary-bg-color: #AB9B96;
   --accent-bg-color: #333333;
   --accent1: #66101F;
+  --nav-total: 150px;
+  --nav-h: 72px;
+  --nav-total: 150px;
 }
 
 *{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+section {
+  scroll-margin-top: var(--nav-total);
 }
 
 html{
@@ -30,16 +37,18 @@ html{
   grid-template-columns: auto 1fr;
   align-items: center;
 
-  padding: 0.1rem 1.5rem;
-  background-color: var(--accent-bg-color);
-  border-bottom: 1px solid rgba(0,0,0,0.08);
+  height: var(--nav-h);
+  padding: 0 1.5rem;
 
-  position: fixed; /* optional */
+  background-color: var(--accent-bg-color);
+  border-bottom: none;
+
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
 
-  z-index: 1000; 
+  z-index: 1000;
 }
 
 .name-nav {
@@ -78,10 +87,12 @@ html{
   align-items: center;
   justify-content: center;
 
-  min-height: 100vh;
-  height: 100svh;
+  min-height: calc(100svh - var(--nav-h));
+  height: calc(100svh - var(--nav-h));
 
-  /* full-bleed even if a parent has padding */
+  margin-top: var(--nav-h);
+  margin-bottom: 0;
+
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
@@ -93,25 +104,22 @@ html{
   background-image: url("assets/Images/Block.png");
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 110% auto; /* slight zoom to hide transparent PNG margins */
+  background-size: 110% auto;
 
-  /* NOTE: filter affects the whole section (including text). If you only want
-     the background adjusted, move the image into a pseudo-element instead. */
   filter: contrast(0.9) brightness(1.05);
-
-  scroll-margin-top: var(--nav-h);
 }
 
 .welcome-block::before {
   content: "";
   position: absolute;
   inset: 0;
+
   background: radial-gradient(
     ellipse at center,
     rgba(255, 255, 255, 0) 55%,
     rgba(255, 255, 255, 0.6) 100%
   );
-  pointer-events: none;
+   pointer-events: none;
   z-index: 1;
 }
 
@@ -119,7 +127,9 @@ html{
   content: "";
   position: absolute;
   inset: 0;
+
   background: rgba(255, 255, 255, 0.35);
+
   pointer-events: none;
   z-index: 2;
 }
@@ -203,7 +213,7 @@ html{
 
 .about-text-line {
   font-size: 1.5rem;
-  padding-top: 1rem;
+  padding-top: 1.0rem;
 }
 
 .headshot-wrapper {
@@ -584,24 +594,47 @@ html{
   align-items: center;
 }
 
-.image-row{
+.image-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+
+  gap: 2.5rem;                 /* spacing between images */
+  padding: 0 1rem;             /* outer padding */
 
   width: min(90%, 1200px);
   margin: 3rem auto;
+
+  align-items: center;         /* vertical alignment across row */
 }
 
-.image-half{
+.image-row-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);  /* 2 images */
+
+  gap: 2.5rem;
+  padding: 0 1rem;
+
+  width: min(90%, 900px);   /* slightly narrower for better balance */
+  margin: 3rem auto;
+
+  align-items: center;
+  justify-items: center;    /* centers each image horizontally */
+}
+
+.image-half {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: center;     /* vertical centering inside column */
+  align-items: center;         /* horizontal centering */
+
+  padding: 0.75rem;            /* spacing inside each image block */
 }
 
-.image-half img{
-  width: 110%;
+.image-half img {
+  width: 100%;
+  max-width: 350px;   /* keeps images consistent size */
   height: auto;
+  display: block;
 }
 
 .full-image__media{
@@ -616,6 +649,23 @@ html{
   color: rgba(0,0,0,0.7);
   text-align: center;
   max-width: 90%;
+}
+
+.image-container-75 {
+  width: min(75%, 1000px);   /* fixes alignment + scaling */
+  margin: 3rem auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;       /* matches your other image systems */
+
+  text-align: center;
+}
+
+.image-container-75 img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 /* ==========================================================================
@@ -731,4 +781,65 @@ hr {
   width: 100%;
   height: auto;
   display: block;
+}
+
+.project-nav {
+  position: sticky;
+  top: var(--nav-h);
+  z-index: 999;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0.8rem 1rem;
+
+  background-color: var(--accent-bg-color);
+  border-top: none;
+  border-bottom: none;
+}
+
+.project-nav a {
+  text-decoration: none;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 0.95rem;
+  color: var(--primary-bg-color);
+
+  padding: 0.3rem 0.5rem;
+
+  transition: all 0.2s ease;
+}
+
+.project-nav a:hover {
+  color: var(--accent1);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   SIDE-BY-SIDE VIDEO PAIR
+   ========================================================================== */
+
+.video-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  width: min(90%, 1200px);
+  margin: 3rem auto;
+  align-items: start;
+}
+
+.video-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.video-card__media {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 4px;
 }
